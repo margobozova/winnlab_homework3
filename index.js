@@ -30,12 +30,14 @@ const readPromise = new Promise((resolve, reject) => {
 
 async function writeCopyRead() {
   await writePromise.then(result => result(THE_FILE, "Hellooo!"), error => console.log(`Error: ${error}`));
-  await fs.open(THE_FILE, 'r', async (err, fd) => {
+  await fs.open(THE_FILE, 'r', async (err) => {
     if (err) {
       console.log('OPEN ERR:', err);
       return;
     }
+
     await copyPromise.then(result => result('files/files', 'files/NEW_FILE'));
+
     const NEW_FILE = `${process.env.PWD}/files/NEW_FILE`;
 
     await readPromise.then(result => result(NEW_FILE), err => console.log(err, "Error read"));
@@ -43,5 +45,3 @@ async function writeCopyRead() {
 }
 
 writeCopyRead();
-
-
