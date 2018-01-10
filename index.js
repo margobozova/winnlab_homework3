@@ -23,8 +23,8 @@ const copyPromise = new  Promise((resolve, reject) => {
 
 const readPromise = new Promise((resolve, reject) => {
   resolve((THE_FILE) => fs.readFile(THE_FILE, 'utf-8', (err, data) => {
-    console.log(data);
-    resolve(err);
+    resolve(data);
+    reject(err);
   }));
 });
 
