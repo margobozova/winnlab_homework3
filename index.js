@@ -2,45 +2,49 @@ const fs = require('fs');
 
 const THE_FILE = `${process.env.PWD}/files/files`;
 
-const writePromise = new Promise((resolve, reject) => {
-  resolve((THE_FILE, str) =>  fs.writeFile(THE_FILE, str, (err) => {
-    reject(err);
-  }));
-});
+const writePromise = (THE_FILE, str) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(THE_FILE, str, (err) => {
+      if (err) {
+        reject(err);
+      } else resolve('Hello, i am new file');
+    });
+  });
+};
 
-const copyPromise = new  Promise((resolve, reject) => {
-
-  resolve((fromFile, destFile) => {
+const copyPromise = (fromFile, destFile) => {
+  return new  Promise((resolve, reject) => {
     const fr = fs.createReadStream(fromFile);
     const to = fs.createWriteStream(destFile);
 
-    return fr.pipe(to)
-      .on('finish', () => console.log('done'))
-  });
+    resolve(fr.pipe(to)
+      .on('finish', () => console.log('done')));
 
-  reject('Oooops! we have a problem');
-});
+      reject('Oooops! we have a problem');
+    });
+};
 
-const readPromise = new Promise((resolve, reject) => {
-  resolve((THE_FILE) => fs.readFile(THE_FILE, 'utf-8', (err, data) => {
-    resolve(data);
-    reject(err);
-  }));
-});
+const readPromise = (THE_FILE) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(THE_FILE, 'utf-8', (err, data) => {
+      resolve(data);
+      reject(err);
+    })});
+};
 
 async function writeCopyRead() {
-  await writePromise.then(result => result(THE_FILE, "Hellooo!"), error => console.log(`Error: ${error}`));
+  await writePromise(THE_FILE, "Hellooo!").then(result => console.log(result));
   await fs.open(THE_FILE, 'r', async (err) => {
     if (err) {
       console.log('OPEN ERR:', err);
       return;
     }
 
-    await copyPromise.then(result => result('files/files', 'files/NEW_FILE'));
+    await copyPromise('files/files', 'files/NEW_FILE').then(result => console.log(result));
 
     const NEW_FILE = `${process.env.PWD}/files/NEW_FILE`;
 
-    await readPromise.then(result => result(NEW_FILE), err => console.log(err, "Error read"));
+    await readPromise(NEW_FILE).then(result => console.log(result));
   });
 }
 
